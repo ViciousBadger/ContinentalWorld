@@ -10,7 +10,7 @@ namespace ContinentalWorld
         int seed;
         float coordinateScale;
 
-        private HashSet<int> forceLandHashes = new HashSet<int>();
+        private HashSet<int> forceLandHashes;
 
         public CustomWorley(long seed, float coordinateScale, List<XZ> requireLandAt)
         {
@@ -21,19 +21,14 @@ namespace ContinentalWorld
             // cellular hash value.
             // When sampling points, we'll just check if the has of that point
             // is in the list to force a certain result.
-            //
+            forceLandHashes = new HashSet<int>();
             foreach (var xz in requireLandAt)
             {
-                // This should "unscale" the XZ positions.. but really we should
-                // use OceanMapScale and RegionSize variables..
-                // var blockX = xz.X / (32f / 512f);
-                // var blockZ = xz.Z / (32f / 512f);
-
                 forceLandHashes.Add(GetPointClosestHash(xz.X, xz.Z));
             }
         }
 
-        public int GetPointClosestHash(float x, float y)
+        private int GetPointClosestHash(float x, float y)
         {
             x = x / this.coordinateScale;
             y = y / this.coordinateScale;
@@ -82,7 +77,7 @@ namespace ContinentalWorld
             int hash = GetPointClosestHash(x, y);
             if (forceLandHashes.Contains(hash))
             {
-                return -1.0f; // -1 = always 0 "oceanicity" = always land
+                return -10.0f;
             }
             else
             {
