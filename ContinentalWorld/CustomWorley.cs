@@ -7,36 +7,43 @@ namespace ContinentalWorld
     class CustomWorley
     {
 
-        long seed;
+        int seed;
         float coordinateScale;
 
-        private HashSet<long> forceLandHashes = new HashSet<long>();
+        private HashSet<int> forceLandHashes = new HashSet<int>();
 
         public CustomWorley(long seed, float coordinateScale, List<XZ> requireLandAt)
         {
-            this.seed = seed;
+            this.seed = unchecked((int)seed);
+            this.coordinateScale = coordinateScale;
 
             // For each required land position, we take hold of the computed
             // cellular hash value.
             // When sampling points, we'll just check if the has of that point
             // is in the list to force a certain result.
-            // foreach (var xz in requireLandAt)
-            // {
-            //     forceLandHashes.Add(GetPointClosestHash(xz.X, xz.Z));
-            // }
+            //
+            foreach (var xz in requireLandAt)
+            {
+                // This should "unscale" the XZ positions.. but really we should
+                // use OceanMapScale and RegionSize variables..
+                // var blockX = xz.X / (32f / 512f);
+                // var blockZ = xz.Z / (32f / 512f);
+
+                forceLandHashes.Add(GetPointClosestHash(xz.X, xz.Z));
+            }
         }
 
-        public long GetPointClosestHash(float x, float y)
+        public int GetPointClosestHash(float x, float y)
         {
-            // x = x / this.coordinateScale;
-            // y = y / this.coordinateScale;
+            x = x / this.coordinateScale;
+            y = y / this.coordinateScale;
 
             int xr = FastRound(x);
             int yr = FastRound(y);
 
             float distance0 = float.MaxValue;
             float distance1 = float.MaxValue;
-            long closestHash = 0;
+            int closestHash = 0;
 
             float cellularJitter = 0.43701595f;
 
@@ -49,8 +56,8 @@ namespace ContinentalWorld
 
                 for (int yi = yr - 1; yi <= yr + 1; yi++)
                 {
-                    long hash = Hash(this.seed, xPrimed, yPrimed);
-                    long idx = hash & (255 << 1);
+                    int hash = Hash(this.seed, xPrimed, yPrimed);
+                    int idx = hash & (255 << 1);
 
                     float vecX = (float)(xi - x) + RandVecs2D[idx] * cellularJitter;
                     float vecY = (float)(yi - y) + RandVecs2D[idx | 1] * cellularJitter;
@@ -72,7 +79,7 @@ namespace ContinentalWorld
 
         public float GetPointValue(float x, float y)
         {
-            long hash = GetPointClosestHash(x, y);
+            int hash = GetPointClosestHash(x, y);
             if (forceLandHashes.Contains(hash))
             {
                 return -1.0f; // -1 = always 0 "oceanicity" = always land
@@ -91,9 +98,9 @@ namespace ContinentalWorld
         private const int PrimeZ = 1720413743;
 
         [MethodImpl(INLINE)]
-        private static long Hash(long seed, long xPrimed, long yPrimed)
+        private static int Hash(int seed, int xPrimed, int yPrimed)
         {
-            long hash = seed ^ xPrimed ^ yPrimed;
+            int hash = seed ^ xPrimed ^ yPrimed;
 
             hash *= 0x27d4eb2d;
             return hash;

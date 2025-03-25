@@ -14,7 +14,7 @@ namespace ContinentalWorld
         public MapLayerContinental(long seed, float scale, float landCoverRate, List<XZ> requireLandAt) : base(seed)
         {
             // this.seed = seed;
-            //this.scale = scale;
+            // this.scale = scale;
             this.landCoverRate = landCoverRate;
 
             this.noiseSource = new CustomWorley(seed, scale, requireLandAt);
