@@ -22,7 +22,7 @@ namespace ContinentalWorld
             // this.scale = scale;
             this.landCoverRate = landCoverRate;
 
-            this.noiseSource = new CustomWorley(seed, scale, requireLandAt);
+            this.noiseSource = new CustomWorley(seed, scale * 2.0f, requireLandAt);
 
             int warpOctaves = 4;
             float warpScale = 0.5f * TerraGenConfig.oceanMapScale;
