@@ -32,6 +32,18 @@ namespace ContinentalWorld
             this.warpNoiseX = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 628903);
             this.warpNoiseZ = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 467216);
 
+            var debug = new NoiseDebug(1024, 1024);
+            for (var x = 0; x < 1024; x++)
+            {
+                for (var z = 0; z < 1024; z++)
+                {
+                    var noise = NoiseAt(x, z);
+                    debug.SetPixel(x, z, new SkiaSharp.SKColor((uint)noise));
+                }
+            }
+
+            debug.SaveToFile("test.bmp");
+
         }
 
         public int NoiseAt(int x, int z)

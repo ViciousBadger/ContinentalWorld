@@ -12,7 +12,7 @@ namespace ContinentalWorld
         public static void GetOceanMapGen(ref MapLayerBase __result, long seed, float landcover, int oceanMapScale, float oceanScaleMul, List<XZ> requireLandAt, bool requiresSpawnOffset)
         {
             var map = new MapLayerContinental(seed, oceanMapScale * oceanScaleMul, landcover, requireLandAt);
-            var blur = new MapLayerBlurSafe(seed, map, 5);
+            var blur = new MapLayerBlurImproved(seed, map, 8);
             __result = blur;
         }
     }
