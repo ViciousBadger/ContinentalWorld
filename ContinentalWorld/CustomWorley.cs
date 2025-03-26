@@ -4,7 +4,7 @@ using Vintagestory.ServerMods;
 
 namespace ContinentalWorld
 {
-    class CustomWorley
+    public class CustomWorley
     {
 
         int seed;

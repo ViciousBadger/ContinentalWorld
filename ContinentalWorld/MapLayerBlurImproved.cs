@@ -2,7 +2,7 @@ using Vintagestory.ServerMods;
 
 namespace ContinentalWorld
 {
-    class MapLayerBlurImproved : MapLayerBase
+    public class MapLayerBlurImproved : MapLayerBase
     {
         private int iterations;
         private MapLayerBase parent;
