@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Vintagestory.API.MathTools;
 using Vintagestory.ServerMods;
 
 namespace ContinentalWorld
@@ -7,15 +8,27 @@ namespace ContinentalWorld
     public class CustomWorley
     {
 
-        int seed;
-        float coordinateScale;
+        private int seed;
+        private float scale;
+        private float warpPower;
 
         private HashSet<int> forceLandHashes;
 
-        public CustomWorley(long seed, float coordinateScale, List<XZ> requireLandAt)
+        private NormalizedSimplexNoise warpNoiseX;
+        private NormalizedSimplexNoise warpNoiseZ;
+
+        public CustomWorley(long seed, float scale, List<XZ> requireLandAt)
         {
+            int warpOctaves = 5;
+            float warpScale = 4.0f * scale;
+            float warpPersistence = 0.75f;
+            this.warpPower = scale * 2.0f;
+
+            this.warpNoiseX = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 628903);
+            this.warpNoiseZ = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 467216);
+
             this.seed = unchecked((int)seed);
-            this.coordinateScale = coordinateScale;
+            this.scale = scale;
 
             // For each required land position, we take hold of the computed
             // cellular hash value.
@@ -28,19 +41,22 @@ namespace ContinentalWorld
             }
         }
 
-        private int GetPointClosestHash(float x, float y)
+        private int GetPointClosestHash(double x, double y)
         {
-            x = x / this.coordinateScale;
-            y = y / this.coordinateScale;
+            x = x + this.warpNoiseX.Noise(x, y) * this.warpPower;
+            y = y + this.warpNoiseZ.Noise(x, y) * this.warpPower;
+
+            x = x / (this.scale * 2.0f);
+            y = y / (this.scale * 2.0f);
 
             int xr = FastRound(x);
             int yr = FastRound(y);
 
-            float distance0 = float.MaxValue;
-            float distance1 = float.MaxValue;
+            double distance0 = double.MaxValue;
+            double distance1 = double.MaxValue;
             int closestHash = 0;
 
-            float cellularJitter = 0.43701595f;
+            double cellularJitter = 0.43701595f;
 
             int xPrimed = (xr - 1) * PrimeX;
             int yPrimedBase = (yr - 1) * PrimeY;
@@ -54,10 +70,10 @@ namespace ContinentalWorld
                     int hash = Hash(this.seed, xPrimed, yPrimed);
                     int idx = hash & (255 << 1);
 
-                    float vecX = (float)(xi - x) + RandVecs2D[idx] * cellularJitter;
-                    float vecY = (float)(yi - y) + RandVecs2D[idx | 1] * cellularJitter;
+                    double vecX = (double)(xi - x) + RandVecs2D[idx] * cellularJitter;
+                    double vecY = (double)(yi - y) + RandVecs2D[idx | 1] * cellularJitter;
 
-                    float newDistance = vecX * vecX + vecY * vecY;
+                    double newDistance = vecX * vecX + vecY * vecY;
 
                     distance1 = FastMax(FastMin(distance1, newDistance), distance0);
                     if (newDistance < distance0)
@@ -72,7 +88,7 @@ namespace ContinentalWorld
             return closestHash;
         }
 
-        public float GetPointValue(float x, float y)
+        public double GetPointValue(double x, double y)
         {
             int hash = GetPointClosestHash(x, y);
             if (forceLandHashes.Contains(hash))
@@ -102,13 +118,13 @@ namespace ContinentalWorld
         }
 
         [MethodImpl(INLINE)]
-        private static float FastMin(float a, float b) { return a < b ? a : b; }
+        private static double FastMin(double a, double b) { return a < b ? a : b; }
 
         [MethodImpl(INLINE)]
-        private static float FastMax(float a, float b) { return a > b ? a : b; }
+        private static double FastMax(double a, double b) { return a > b ? a : b; }
 
         [MethodImpl(INLINE)]
-        private static int FastRound(float f) { return f >= 0 ? (int)(f + 0.5f) : (int)(f - 0.5f); }
+        private static int FastRound(double f) { return f >= 0 ? (int)(f + 0.5f) : (int)(f - 0.5f); }
 
         private static readonly float[] RandVecs2D =
     {

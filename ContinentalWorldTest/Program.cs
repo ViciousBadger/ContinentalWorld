@@ -8,7 +8,7 @@ namespace ContinentalWorldTest
     {
         static void Main(string[] args)
         {
-            long seed = 123;
+            long seed = 2358917986;
             var forceLand = new List<XZ>();
             forceLand.Add(new XZ(512, 512));
             forceLand.Add(new XZ(256, 256));
@@ -16,7 +16,7 @@ namespace ContinentalWorldTest
             forceLand.Add(new XZ(256, 768));
             forceLand.Add(new XZ(768, 768));
 
-            var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.0f, forceLand);
+            var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.3f, forceLand);
             var blur = new MapLayerBlurImproved(seed, map, 8);
 
             var debug = new NoiseDebug(1024, 1024);
