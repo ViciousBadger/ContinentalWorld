@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
+using Vintagestory.API.Server;
 using Vintagestory.ServerMods;
 
 namespace ContinentalWorld

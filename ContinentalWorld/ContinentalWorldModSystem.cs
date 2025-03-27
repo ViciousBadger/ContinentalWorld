@@ -10,9 +10,12 @@ public class ContinentalWorldModSystem : ModSystem
 {
     private Harmony patcher;
 
+    public static ILogger Logger;
+
     // Called on server and client
     public override void Start(ICoreAPI api)
     {
+        Logger = Mod.Logger;
         Mod.Logger.Notification("Hello from template mod: " + api.Side);
 
         if (!Harmony.HasAnyPatches(Mod.Info.ModID))

@@ -12,13 +12,18 @@ namespace ContinentalWorld
         private float scale;
         private float warpPower;
 
-        private HashSet<int> forceLandHashes;
+        // private HashSet<int> forceLandHashes;
+        private List<XZ> requireLandAt;
+        private Dictionary<int, int> requiredLandHashes;
 
         private NormalizedSimplexNoise warpNoiseX;
         private NormalizedSimplexNoise warpNoiseZ;
 
         public CustomWorley(long seed, float scale, List<XZ> requireLandAt)
         {
+            this.requireLandAt = requireLandAt;
+            this.requiredLandHashes = new Dictionary<int, int>();
+
             int warpOctaves = 5;
             float warpScale = 4.0f * scale;
             float warpPersistence = 0.75f;
@@ -34,11 +39,46 @@ namespace ContinentalWorld
             // cellular hash value.
             // When sampling points, we'll just check if the has of that point
             // is in the list to force a certain result.
-            forceLandHashes = new HashSet<int>();
-            foreach (var xz in requireLandAt)
+            // forceLandHashes = new HashSet<int>();
+            // foreach (var xz in requireLandAt)
+            // {
+            //     forceLandHashes.Add(GetPointClosestHash(xz.X + 8, xz.Z));
+
+            // ContinentalWorldModSystem.Logger.Notification("REQUIRE LAND AT");
+            // ContinentalWorldModSystem.Logger.Notification(xz.X + " - " + xz.Z);
+            // }
+
+        }
+
+        public double GetPointValue(double x, double y)
+        {
+            var pointHash = GetPointClosestHash(x, y);
+            //ContinentalWorldModSystem.Logger.Notification("length is " + this.requireLandAt.Count);
+            //ContinentalWorldModSystem.Logger.Notification("calculated hashes: " + this.requiredLandHashes.Count);
+            for (var i = 0; i < this.requireLandAt.Count; i++)
             {
-                forceLandHashes.Add(GetPointClosestHash(xz.X, xz.Z));
+                var xz = this.requireLandAt[i];
+                var hashCode = System.HashCode.Combine(xz.X, xz.Z);
+                if (this.requiredLandHashes.TryGetValue(hashCode, out int hash))
+                {
+                    if (pointHash == hash)
+                    {
+                        return -10.0f;
+                    }
+                }
+                else
+                {
+
+                    var newHash = GetPointClosestHash(xz.X, xz.Z);
+
+                    this.requiredLandHashes.Add(hashCode, newHash);
+                    if (pointHash == newHash)
+                    {
+                        return -10.0f;
+                    }
+                }
             }
+            return pointHash * (1 / 2147483648.0f);
         }
 
         private int GetPointClosestHash(double x, double y)
@@ -86,19 +126,6 @@ namespace ContinentalWorld
                 xPrimed += PrimeX;
             }
             return closestHash;
-        }
-
-        public double GetPointValue(double x, double y)
-        {
-            int hash = GetPointClosestHash(x, y);
-            if (forceLandHashes.Contains(hash))
-            {
-                return -10.0f;
-            }
-            else
-            {
-                return hash * (1 / 2147483648.0f);
-            }
         }
 
         private const short INLINE = 256; // MethodImplOptions.AggressiveInlining;
