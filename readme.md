@@ -12,9 +12,7 @@ Landforms are not affected at all, so you can use this with any world generation
 
 **Landcover scale**: 100% is tuned to give reasonably sized oceans so you likely won't have to sail for days to reach new continents. At this setting each landmass/ocean "tile" is about 1000-1500 square blocks in size. If you prefer more a realistic scale, 200% to 400% is ideal.
 
-If you're using the rivers mod, the default settings work fine, but you may want to adjust landScaleMultiplier depending on your landcover scale - 1.0 for 100%, 1.5 for 200%, 2.0 for 400%.
-
-You can also use my customized rivers config, it tunes the rivers to be a bit more wobbly and removes boulders and river tunnels. of course this is only personal preference.
+If you're using the rivers mod, the default settings work fine. You can also use my customized rivers config, it tunes the rivers to be a bit more wobbly, removes boulders and river tunnels, and a few other things. of course this is only personal preference. Note that the "landScaleMultiplier" setting  in Rivers has no effect when also using my mod.
 
 ```
 {
@@ -26,7 +24,7 @@ You can also use my customized rivers config, it tunes the rivers to be a bit mo
 "valleyStrengthMin": 0.8,
 "noiseExpansion": 1.25,
 "riverPaddingBlocks": 256,
-"landScaleMultiplier": 1.0, // adjust this to match your landcover scale - 1.0 for 100%, 1.5 for 200%, 2.0 for 400%.
+"landScaleMultiplier": 1.0,
 "minSize": 14.0,
 "maxSize": 50.0,
 "minNodes": 8,
