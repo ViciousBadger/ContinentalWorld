@@ -10,14 +10,12 @@ public class ContinentalWorldModSystem : ModSystem
 {
     private Harmony patcher;
 
-    public static ILogger Logger;
+    // public static ILogger Logger;
 
     // Called on server and client
     public override void Start(ICoreAPI api)
     {
-        Logger = Mod.Logger;
-        Mod.Logger.Notification("Hello from template mod: " + api.Side);
-
+        // Logger = Mod.Logger;
         if (!Harmony.HasAnyPatches(Mod.Info.ModID))
         {
             patcher = new Harmony(Mod.Info.ModID);
@@ -27,12 +25,10 @@ public class ContinentalWorldModSystem : ModSystem
 
     public override void StartServerSide(ICoreServerAPI api)
     {
-        Mod.Logger.Notification("Hello from template mod server side: " + Lang.Get("continentalworld:hello"));
     }
 
     public override void StartClientSide(ICoreClientAPI api)
     {
-        Mod.Logger.Notification("Hello from template mod client side: " + Lang.Get("continentalworld:hello"));
     }
 
     public override void Dispose()

@@ -8,13 +8,13 @@ namespace ContinentalWorldTest
     {
         static void Main(string[] args)
         {
-            long seed = 2358917986;
+            long seed = 123123123123;
             var forceLand = new List<XZ>();
             forceLand.Add(new XZ(512, 512));
-            forceLand.Add(new XZ(256, 256));
-            forceLand.Add(new XZ(768, 256));
-            forceLand.Add(new XZ(256, 768));
-            forceLand.Add(new XZ(768, 768));
+            // forceLand.Add(new XZ(256, 256));
+            // forceLand.Add(new XZ(768, 256));
+            // forceLand.Add(new XZ(256, 768));
+            // forceLand.Add(new XZ(768, 768));
 
             var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.3f, forceLand);
             var blur = new MapLayerBlurImproved(seed, map, 8);
@@ -27,16 +27,16 @@ namespace ContinentalWorldTest
             {
                 for (var z = 0; z < 1024; z++)
                 {
-                    var sample = (byte)layer[z * 1024 + x];
-                    var color = new SkiaSharp.SKColor(sample, sample, sample);
+                    byte sample = (byte)layer[z * 1024 + x];
+                    var color = new SkiaSharp.SKColor((byte)30, (byte)(170 - (byte)(sample * 0.5f)), (byte)(sample * 0.5f));
                     debug.SetPixel(x, z, color);
                 }
             }
 
-            foreach (var land in forceLand)
-            {
-                debug.SetPixel(land.X, land.Z, new SkiaSharp.SKColor(255, 0, 0));
-            }
+            // foreach (var land in forceLand)
+            // {
+            //     debug.SetPixel(land.X, land.Z, new SkiaSharp.SKColor(255, 0, 0));
+            // }
 
 
             debug.SaveToFile("test.bmp");

@@ -4,6 +4,9 @@ namespace ContinentalWorld
 {
     public class MapLayerBlurImproved : MapLayerBase
     {
+        // Author's note: "Improved" is a bit hyperbole. I had to re-implement the blur algorithm because
+        // 1) The original class in VS Surival is marked private and cannot be used in mods
+        // 2) The original algorithm uses unsafe code, which I would like to avoid as I am raw-pointer-phobic :)
         private int iterations;
         private MapLayerBase parent;
 

@@ -1,13 +1,13 @@
 {
-    "type": "code",
-    "modid": "continentalworld",
-    "name": "ContinentalWorld",
-    "authors": [
-        "Unknown"
-    ],
-    "description": "To be added",
-    "version": "1.0.0",
-    "dependencies": {
-        "game": ""
-    }
+  "type": "code",
+  "modid": "continentalworld",
+  "name": "Continental World",
+  "authors": [
+    "badgerson"
+  ],
+  "description": "Alters the way continents and landmasses are generated.",
+  "version": "1.0.0",
+  "dependencies": {
+    "game": "1.20.0"
+  }
 }

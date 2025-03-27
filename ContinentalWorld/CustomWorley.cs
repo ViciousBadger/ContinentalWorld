@@ -12,75 +12,47 @@ namespace ContinentalWorld
         private float scale;
         private float warpPower;
 
-        // private HashSet<int> forceLandHashes;
-        private List<XZ> requireLandAt;
-        private Dictionary<int, int> requiredLandHashes;
+        private HashSet<int> requiredLandHashes;
 
         private NormalizedSimplexNoise warpNoiseX;
         private NormalizedSimplexNoise warpNoiseZ;
 
-        public CustomWorley(long seed, float scale, List<XZ> requireLandAt)
+        public CustomWorley(long seed, float scale)
         {
-            this.requireLandAt = requireLandAt;
-            this.requiredLandHashes = new Dictionary<int, int>();
-
+            // Use the VS built-in simplex noise for domain wrap. This makes the continent shapes actually interesting.
             int warpOctaves = 5;
             float warpScale = 4.0f * scale;
             float warpPersistence = 0.75f;
             this.warpPower = scale * 2.0f;
-
             this.warpNoiseX = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 628903);
             this.warpNoiseZ = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 467216);
 
             this.seed = unchecked((int)seed);
             this.scale = scale;
+            this.requiredLandHashes = new HashSet<int>();
+        }
 
-            // For each required land position, we take hold of the computed
-            // cellular hash value.
-            // When sampling points, we'll just check if the has of that point
-            // is in the list to force a certain result.
-            // forceLandHashes = new HashSet<int>();
-            // foreach (var xz in requireLandAt)
-            // {
-            //     forceLandHashes.Add(GetPointClosestHash(xz.X + 8, xz.Z));
-
-            // ContinentalWorldModSystem.Logger.Notification("REQUIRE LAND AT");
-            // ContinentalWorldModSystem.Logger.Notification(xz.X + " - " + xz.Z);
-            // }
-
+        public void RequireLandAt(XZ xz)
+        {
+            requiredLandHashes.Add(GetPointClosestHash(xz.X, xz.Z));
         }
 
         public double GetPointValue(double x, double y)
         {
             var pointHash = GetPointClosestHash(x, y);
-            //ContinentalWorldModSystem.Logger.Notification("length is " + this.requireLandAt.Count);
-            //ContinentalWorldModSystem.Logger.Notification("calculated hashes: " + this.requiredLandHashes.Count);
-            for (var i = 0; i < this.requireLandAt.Count; i++)
+            if (requiredLandHashes.Contains(pointHash))
             {
-                var xz = this.requireLandAt[i];
-                var hashCode = System.HashCode.Combine(xz.X, xz.Z);
-                if (this.requiredLandHashes.TryGetValue(hashCode, out int hash))
-                {
-                    if (pointHash == hash)
-                    {
-                        return -10.0f;
-                    }
-                }
-                else
-                {
-
-                    var newHash = GetPointClosestHash(xz.X, xz.Z);
-
-                    this.requiredLandHashes.Add(hashCode, newHash);
-                    if (pointHash == newHash)
-                    {
-                        return -10.0f;
-                    }
-                }
+                return -10.0f; // -10 = always land
             }
-            return pointHash * (1 / 2147483648.0f);
+            else
+            {
+                return pointHash * (1 / 2147483648.0f); // Mapped from the range of signed int to [-1, 1]
+            }
         }
 
+
+        // The following code generates Worley noise, modified to only return hash values, ripped from the c# implementation of FastNoiseLite (MIT Licensed)
+        // See https://github.com/Auburn/FastNoiseLite/blob/master/CSharp/FastNoiseLite.cs
         private int GetPointClosestHash(double x, double y)
         {
             x = x + this.warpNoiseX.Noise(x, y) * this.warpPower;
