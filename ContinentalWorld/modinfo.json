@@ -6,7 +6,7 @@
     "badgerson"
   ],
   "description": "Alters the way oceans and landmasses are generated.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "game": "1.20.0"
   },

@@ -16,6 +16,9 @@ namespace ContinentalWorld
 
         private NormalizedSimplexNoise warpNoiseX;
         private NormalizedSimplexNoise warpNoiseZ;
+        private NormalizedSimplexNoise islandsNose;
+
+        private float islandThreshold;
 
         public CustomWorley(long seed, float scale)
         {
@@ -26,6 +29,13 @@ namespace ContinentalWorld
             this.warpPower = scale * 2.0f;
             this.warpNoiseX = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 628903);
             this.warpNoiseZ = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 467216);
+
+            int islandOctaves = 5;
+            float islandScale = TerraGenConfig.oceanMapScale * 2.0f;
+            float islandPersistence = 0.9f;
+            this.islandThreshold = 0.80f;
+
+            this.islandsNose = NormalizedSimplexNoise.FromDefaultOctaves(islandOctaves, 1f / islandScale, islandPersistence, seed + 664198);
 
             this.seed = unchecked((int)seed);
             this.scale = scale;
@@ -46,7 +56,15 @@ namespace ContinentalWorld
             }
             else
             {
-                return pointHash * (1 / 2147483648.0f); // Mapped from the range of signed int to [-1, 1]
+                var islandsSample = this.islandsNose.Noise(x, y);
+                if (islandsSample > islandThreshold)
+                {
+                    return -10.0f; // -10 = always land
+                }
+                else
+                {
+                    return pointHash * (1 / 2147483648.0f); // Mapped from the range of signed int to [-1, 1]
+                }
             }
         }
 

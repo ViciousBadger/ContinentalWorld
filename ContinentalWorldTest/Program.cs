@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ContinentalWorld;
 using Vintagestory.ServerMods;
+using SkiaSharp;
 
 namespace ContinentalWorldTest
 {
@@ -8,7 +9,12 @@ namespace ContinentalWorldTest
     {
         static void Main(string[] args)
         {
-            long seed = 123123123123;
+            float Lerp(float a, float b, float f)
+            {
+                return a * (1.0f - f) + (b * f);
+            }
+
+            long seed = 1235;
             var forceLand = new List<XZ>();
             forceLand.Add(new XZ(512, 512));
             // forceLand.Add(new XZ(256, 256));
@@ -19,6 +25,8 @@ namespace ContinentalWorldTest
             var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.3f, forceLand);
             var blur = new MapLayerBlurImproved(seed, map, 8);
 
+            // var blur = GenMaps.GetOceanMapGen(seed, 0.3f, TerraGenConfig.oceanMapScale, 1.0f, forceLand, false);
+
             var debug = new NoiseDebug(1024, 1024);
 
             var layer = blur.GenLayer(0, 0, 1024, 1024);
@@ -28,8 +36,17 @@ namespace ContinentalWorldTest
                 for (var z = 0; z < 1024; z++)
                 {
                     byte sample = (byte)layer[z * 1024 + x];
-                    var color = new SkiaSharp.SKColor((byte)30, (byte)(170 - (byte)(sample * 0.5f)), (byte)(sample * 0.5f));
-                    debug.SetPixel(x, z, color);
+                    float oceanValue = sample / 255f;
+                    SKColor land = new SKColor(153, 122, 78);
+                    SKColor ocean = new SKColor(193, 183, 130);
+
+                    SKColor blended = new SKColor(
+                        (byte)Lerp(land.Red, ocean.Red, oceanValue),
+                        (byte)Lerp(land.Green, ocean.Green, oceanValue),
+                        (byte)Lerp(land.Blue, ocean.Blue, oceanValue)
+                    );
+
+                    debug.SetPixel(x, z, blended);
                 }
             }
 
