@@ -21,8 +21,12 @@ namespace ContinentalWorldTest
             // forceLand.Add(new XZ(768, 256));
             // forceLand.Add(new XZ(256, 768));
             // forceLand.Add(new XZ(768, 768));
+            //
+            var config = new ContinentalConfig()
+            {
+            };
 
-            var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.3f, forceLand);
+            var map = new MapLayerContinental(seed, TerraGenConfig.oceanMapScale * 1.0f, 0.3f, forceLand, config);
             var blur = new MapLayerBlurImproved(seed, map, 8);
 
             // var blur = GenMaps.GetOceanMapGen(seed, 0.3f, TerraGenConfig.oceanMapScale, 1.0f, forceLand, false);

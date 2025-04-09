@@ -10,6 +10,7 @@ namespace ContinentalWorld
 
         private int seed;
         private float scale;
+        private ContinentalConfig config;
         private float warpPower;
 
         private HashSet<int> requiredLandHashes;
@@ -20,20 +21,21 @@ namespace ContinentalWorld
 
         private float islandThreshold;
 
-        public CustomWorley(long seed, float scale)
+        public CustomWorley(long seed, float scale, ContinentalConfig config)
         {
+            this.config = config;
             // Use the VS built-in simplex noise for domain wrap. This makes the continent shapes actually interesting.
-            int warpOctaves = 5;
-            float warpScale = 4.0f * scale;
-            float warpPersistence = 0.75f;
-            this.warpPower = scale * 2.0f;
+            int warpOctaves = config.ContinentWarpOctaves;
+            float warpScale = config.ContinentWarpScale * scale;
+            float warpPersistence = config.ContinentWarpPersistence;
+            this.warpPower = scale * config.ContinentWarpPower;
             this.warpNoiseX = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 628903);
             this.warpNoiseZ = NormalizedSimplexNoise.FromDefaultOctaves(warpOctaves, 1 / warpScale, warpPersistence, seed + 467216);
 
-            int islandOctaves = 5;
-            float islandScale = TerraGenConfig.oceanMapScale * 2.0f;
-            float islandPersistence = 0.9f;
-            this.islandThreshold = 0.80f;
+            this.islandThreshold = config.IslandThreshold;
+            int islandOctaves = config.IslandNoiseOctaves;
+            float islandScale = TerraGenConfig.oceanMapScale * config.IslandNoiseScale;
+            float islandPersistence = config.IslandNoisePersistence;
 
             this.islandsNose = NormalizedSimplexNoise.FromDefaultOctaves(islandOctaves, 1f / islandScale, islandPersistence, seed + 664198);
 
@@ -76,8 +78,8 @@ namespace ContinentalWorld
             x = x + this.warpNoiseX.Noise(x, y) * this.warpPower;
             y = y + this.warpNoiseZ.Noise(x, y) * this.warpPower;
 
-            x = x / (this.scale * 2.0f);
-            y = y / (this.scale * 2.0f);
+            x = x / (this.scale * config.ExtraLandcoverScale);
+            y = y / (this.scale * config.ExtraLandcoverScale);
 
             int xr = FastRound(x);
             int yr = FastRound(y);
@@ -86,7 +88,7 @@ namespace ContinentalWorld
             double distance1 = double.MaxValue;
             int closestHash = 0;
 
-            double cellularJitter = 0.43701595f;
+            double cellularJitter = config.CellularJitter;
 
             int xPrimed = (xr - 1) * PrimeX;
             int yPrimedBase = (yr - 1) * PrimeY;

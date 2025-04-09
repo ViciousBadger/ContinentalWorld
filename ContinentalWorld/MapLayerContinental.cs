@@ -11,10 +11,10 @@ namespace ContinentalWorld
         private List<XZ> requireLandAt;
         private int lastRequiredLandCount;
 
-        public MapLayerContinental(long seed, float scale, float landCoverRate, List<XZ> requireLandAt) : base(seed)
+        public MapLayerContinental(long seed, float scale, float landCoverRate, List<XZ> requireLandAt, ContinentalConfig config) : base(seed)
         {
             this.landCoverRate = landCoverRate;
-            this.noiseSource = new CustomWorley(seed, scale);
+            this.noiseSource = new CustomWorley(seed, scale, config);
             this.requireLandAt = requireLandAt;
             this.lastRequiredLandCount = 0;
             RefreshRequiredLand();
